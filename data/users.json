@@ -2,5 +2,9 @@
   {
     "username": "Upek",
     "password": "$2a$10$bRaSZfnLHvcpAS1dCn.gEuvsyu6MKAkydqTdJoC17ooC/COajJpVa"
+  },
+  {
+    "username": "testuser",
+    "password": "$2a$10$h4w.63F/vpzvxE9XnmgkcelmFWBc0E9enNTZZ2EEgsliVTXzuSVCS"
   }
 ]

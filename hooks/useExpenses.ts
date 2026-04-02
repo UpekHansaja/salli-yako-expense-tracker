@@ -3,7 +3,21 @@ import { useAuth } from '@/context/AuthContext';
 
 const API_URL = 'http://localhost:3001/api';
 
-const fetcher = (url: string) => fetch(url).then(r => r.json());
+const fetcher = (url: string) => fetch(url).then(r => {
+  if (!r.ok) {
+    throw new Error(`API Error: ${r.status}`);
+  }
+  return r.json();
+});
+
+// SWR configuration to prevent unwanted re-renders and modal closing
+const swrConfig = {
+  revalidateOnFocus: false,
+  revalidateOnReconnect: false,
+  shouldRetryOnError: false,
+  dedupingInterval: 60000,
+  focusThrottleInterval: 300000,
+};
 
 export function useExpenses(month?: number) {
   const { user } = useAuth();
@@ -11,7 +25,7 @@ export function useExpenses(month?: number) {
     ? `${API_URL}/expenses/${user?.id}/month/${month}`
     : `${API_URL}/expenses/${user?.id}`;
 
-  const { data, error, isLoading, mutate } = useSWR(user ? endpoint : null, fetcher);
+  const { data, error, isLoading, mutate } = useSWR(user ? endpoint : null, fetcher, swrConfig);
 
   return {
     expenses: data || [],
@@ -25,7 +39,8 @@ export function useSavingsGoals() {
   const { user } = useAuth();
   const { data, error, isLoading, mutate } = useSWR(
     user ? `${API_URL}/savings-goals/${user.id}` : null,
-    fetcher
+    fetcher,
+    swrConfig
   );
 
   return {
@@ -40,7 +55,8 @@ export function useCategories() {
   const { user } = useAuth();
   const { data, error, isLoading, mutate } = useSWR(
     user ? `${API_URL}/categories/${user.id}` : null,
-    fetcher
+    fetcher,
+    swrConfig
   );
 
   return {
@@ -55,7 +71,8 @@ export function useMonthlyAnalytics(month: number) {
   const { user } = useAuth();
   const { data, error, isLoading } = useSWR(
     user ? `${API_URL}/analytics/${user.id}/monthly/${month}` : null,
-    fetcher
+    fetcher,
+    swrConfig
   );
 
   return {
@@ -69,7 +86,8 @@ export function useYearlyAnalytics() {
   const { user } = useAuth();
   const { data, error, isLoading } = useSWR(
     user ? `${API_URL}/analytics/${user.id}/yearly` : null,
-    fetcher
+    fetcher,
+    swrConfig
   );
 
   return {
@@ -83,7 +101,8 @@ export function useMonthlyReport(month: number) {
   const { user } = useAuth();
   const { data, error, isLoading } = useSWR(
     user ? `${API_URL}/reports/${user.id}/monthly/${month}` : null,
-    fetcher
+    fetcher,
+    swrConfig
   );
 
   return {

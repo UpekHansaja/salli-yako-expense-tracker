@@ -119,7 +119,7 @@ export default function DashboardPage() {
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Total Income</p>
                   <h3 className="text-3xl font-bold text-green-500">
-                    ${(incomeSummary?.total_income || 0).toFixed(2)}
+                    LKR {(incomeSummary?.total_income || 0).toFixed(2)}
                   </h3>
                 </div>
               </div>
@@ -138,7 +138,7 @@ export default function DashboardPage() {
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Total Saved</p>
                   <h3 className="text-3xl font-bold text-accent">
-                    ${totalSaved.toFixed(2)}
+                    LKR {totalSaved.toFixed(2)}
                   </h3>
                 </div>
               </div>
@@ -206,7 +206,7 @@ export default function DashboardPage() {
                       <p className="text-sm font-medium text-foreground">{expense.category_name || 'Uncategorized'}</p>
                       <p className="text-xs text-muted-foreground">{expense.date}</p>
                     </div>
-                    <span className="text-sm font-semibold text-foreground">${parseFloat(expense.amount).toFixed(2)}</span>
+                    <span className="text-sm font-semibold text-foreground">LKR {parseFloat(expense.amount).toFixed(2)}</span>
                   </div>
                 ))}
                 {expenses.length === 0 && (

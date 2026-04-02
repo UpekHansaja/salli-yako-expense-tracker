@@ -460,6 +460,19 @@ app.get('/api/reports/:userId/monthly/:month', (req, res) => {
 
 // ==================== MONTHLY INCOME ROUTES ====================
 
+// Get total monthly income for a user (must come before generic :userId route)
+app.get('/api/monthly-income/:userId/total', (req, res) => {
+  const { userId } = req.params;
+  db.get(
+    'SELECT COALESCE(SUM(amount), 0) as total FROM monthly_income WHERE user_id = ? AND active = 1',
+    [userId],
+    (err, row) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ total: row?.total || 0 });
+    }
+  );
+});
+
 // Get monthly income for a user
 app.get('/api/monthly-income/:userId', (req, res) => {
   const { userId } = req.params;
@@ -552,35 +565,9 @@ app.delete('/api/monthly-income/:id', (req, res) => {
   });
 });
 
-// Get total monthly income for a user
-app.get('/api/monthly-income/:userId/total', (req, res) => {
-  const { userId } = req.params;
-  db.get(
-    'SELECT COALESCE(SUM(amount), 0) as total FROM monthly_income WHERE user_id = ? AND active = 1',
-    [userId],
-    (err, row) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ total: row?.total || 0 });
-    }
-  );
-});
-
 // ==================== OTHER INCOME ROUTES ====================
 
-// Get other income for a user
-app.get('/api/other-income/:userId', (req, res) => {
-  const { userId } = req.params;
-  db.all(
-    'SELECT * FROM other_income WHERE user_id = ? ORDER BY income_date DESC, created_at DESC',
-    [userId],
-    (err, rows) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json(rows || []);
-    }
-  );
-});
-
-// Get other income for a specific month
+// Get other income for a specific month (must come before generic :userId route)
 app.get('/api/other-income/:userId/month/:month', (req, res) => {
   const { userId, month } = req.params;
   const year = new Date().getFullYear();
@@ -591,6 +578,32 @@ app.get('/api/other-income/:userId/month/:month', (req, res) => {
   db.all(
     'SELECT * FROM other_income WHERE user_id = ? AND income_date >= ? AND income_date <= ? ORDER BY income_date DESC',
     [userId, startDate, endDate],
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json(rows || []);
+    }
+  );
+});
+
+// Get total other income for a user (must come before generic :userId route)
+app.get('/api/other-income/:userId/total', (req, res) => {
+  const { userId } = req.params;
+  db.get(
+    'SELECT COALESCE(SUM(amount), 0) as total FROM other_income WHERE user_id = ?',
+    [userId],
+    (err, row) => {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ total: row?.total || 0 });
+    }
+  );
+});
+
+// Get other income for a user
+app.get('/api/other-income/:userId', (req, res) => {
+  const { userId } = req.params;
+  db.all(
+    'SELECT * FROM other_income WHERE user_id = ? ORDER BY income_date DESC, created_at DESC',
+    [userId],
     (err, rows) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json(rows || []);
@@ -647,19 +660,6 @@ app.delete('/api/other-income/:id', (req, res) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: 'Other income deleted' });
   });
-});
-
-// Get total other income for a user
-app.get('/api/other-income/:userId/total', (req, res) => {
-  const { userId } = req.params;
-  db.get(
-    'SELECT COALESCE(SUM(amount), 0) as total FROM other_income WHERE user_id = ?',
-    [userId],
-    (err, row) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ total: row?.total || 0 });
-    }
-  );
 });
 
 // Get combined income summary for a specific month
